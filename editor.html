@@ -1,0 +1,692 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111116">
+  <title>Editor | FabiCommlist</title>
+
+  <style>
+    :root {
+      --bg: #111116;
+      --panel: #1b1b23;
+      --field: #121219;
+      --text: #f5f5f7;
+      --muted: #a5a5b4;
+      --yellow: #ffe45c;
+      --border: #343440;
+      --red: #ff5367;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      padding: 24px 16px;
+      background: #191920;
+      border-bottom: 2px solid var(--yellow);
+    }
+
+    .header-inner, main {
+      max-width: 850px;
+      margin: auto;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(25px, 6vw, 36px);
+    }
+
+    h1 span { color: var(--yellow); }
+
+    .subtitle {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    main { padding: 20px 14px 45px; }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    button {
+      padding: 12px;
+      border: 0;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: not-allowed;
+    }
+
+    .publish {
+      background: var(--yellow);
+      color: #171717;
+    }
+
+    .public {
+      background: #292932;
+      color: white;
+      border: 1px solid #444451;
+    }
+
+    .panel {
+      padding: 16px;
+      margin-bottom: 18px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 13px;
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 19px;
+    }
+
+    .field { margin-bottom: 13px; }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      color: #d4d4de;
+      font-size: 13px;
+    }
+
+    input, select {
+      display: block;
+      width: 100%;
+      min-height: 44px;
+      padding: 11px;
+      color: var(--text);
+      background: var(--field);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    input:focus, select:focus {
+      outline: 1px solid var(--yellow);
+      border-color: var(--yellow);
+    }
+
+    .preview {
+      display: none;
+      width: 100%;
+      max-height: 240px;
+      margin-top: 12px;
+      object-fit: contain;
+      background: #101015;
+      border-radius: 9px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .save {
+      background: var(--yellow);
+      color: #171717;
+    }
+
+    .cancel {
+      background: #30303a;
+      color: white;
+    }
+
+    .level-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .level {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      background: #14141a;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      min-width: 0;
+    }
+
+    .cover {
+      width: 76px;
+      height: 76px;
+      flex-shrink: 0;
+      object-fit: cover;
+      border-radius: 7px;
+      background: #292932;
+    }
+
+    .rank {
+      color: var(--yellow);
+      font-weight: 900;
+      font-size: 16px;
+      min-width: 30px;
+      text-align: center;
+    }
+
+    .info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .info strong {
+      display: block;
+      overflow-wrap: anywhere;
+      margin-bottom: 5px;
+    }
+
+    .info small {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .level-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .level-buttons button {
+      min-width: 42px;
+      padding: 8px 5px;
+      background: #30303a;
+      color: white;
+    }
+
+    .level-buttons .delete { color: #ff8794; }
+
+    .empty, .status {
+      padding: 13px;
+      color: var(--muted);
+      background: #14141a;
+      border-radius: 9px;
+      font-size: 13px;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    .status {
+      margin-bottom: 17px;
+    }
+
+    .status.error { color: #ff8794; }
+    .status.success { color: #9ce9b0; }
+
+    .count {
+      color: var(--muted);
+      font-size: 13px;
+      margin: -7px 0 13px;
+    }
+
+    @media (max-width: 520px) {
+      .actions { grid-template-columns: 1fr; }
+      .panel { padding: 12px; }
+      .level { gap: 7px; padding: 7px; }
+      .cover { width: 54px; height: 62px; }
+      .rank { min-width: 24px; font-size: 13px; }
+      .info strong { font-size: 13px; }
+      .info small { font-size: 10px; }
+      .level-buttons button { min-width: 34px; padding: 8px 4px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>Fabi<span>Comm</span>list</h1>
+      <p class="subtitle">Editor de la Demonlist</p>
+    </div>
+  </header>
+
+  <main>
+    <div class="actions">
+      <button class="publish" id="publish">Publicar nueva versión</button>
+      <button class="public" id="viewPublic">Ver Demonlist pública</button>
+    </div>
+
+    <div class="status" id="status" role="status">
+      Cargando niveles...
+    </div>
+
+    <section class="panel">
+      <h2 id="formTitle">Añadir nivel</h2>
+
+      <form id="levelForm">
+        <div class="field">
+          <label for="name">Nombre del nivel</label>
+          <input id="name" required maxlength="120">
+        </div>
+
+        <div class="field">
+          <label for="position">Posición de entrada</label>
+          <input id="position" type="number" min="1" step="1"
+                 required placeholder="Ejemplo: 2">
+        </div>
+
+        <div class="field">
+          <label for="creator">Creador</label>
+          <input id="creator" required maxlength="120">
+        </div>
+
+        <div class="field">
+          <label for="verifier">Verificador</label>
+          <input id="verifier" maxlength="120">
+        </div>
+
+        <div class="field">
+          <label for="difficulty">Dificultad</label>
+          <select id="difficulty">
+            <option>EXTREME DEMON</option>
+            <option>INSANE DEMON</option>
+            <option>HARD DEMON</option>
+            <option>MEDIUM DEMON</option>
+            <option>EASY DEMON</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="cover">URL de la portada</label>
+          <input id="cover" type="url" placeholder="https://...">
+          <img class="preview" id="preview" alt="Vista previa">
+        </div>
+
+        <div class="field">
+          <label for="video">URL del vídeo</label>
+          <input id="video" type="url" placeholder="https://...">
+        </div>
+
+        <div class="field">
+          <label for="levelId">ID del nivel (opcional)</label>
+          <input id="levelId" maxlength="40">
+        </div>
+
+        <div class="form-actions">
+          <button class="save" id="saveLevel" type="submit">
+            Añadir nivel
+          </button>
+          <button class="cancel" id="cancelEdit" type="button" hidden>
+            Cancelar edición
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Niveles registrados</h2>
+      <div class="count" id="count">0 niveles</div>
+      <div class="level-list" id="levelList"></div>
+    </section>
+  </main>
+
+  <script>
+    const PUBLIC_URL = "https://fabicommlist.netlify.app/";
+    const PUBLISH_ENDPOINT = "/.netlify/functions/publish";
+
+    const $ = id => document.getElementById(id);
+
+    let levels = [];
+    let editingId = null;
+    let nextId = 1;
+    let loaded = false;
+
+    function setStatus(message, type = "") {
+      $("status").textContent = message;
+      $("status").className = "status " + type;
+    }
+
+    function safeUrl(value) {
+      if (!value) return "";
+      try {
+        const url = new URL(value);
+        return ["https:", "http:"].includes(url.protocol) ? url.href : "";
+      } catch {
+        return "";
+      }
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? "").replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;",
+        '"': "&quot;", "'": "&#39;"
+      })[c]);
+    }
+
+    function normalizePositions() {
+      levels.sort((a, b) => a.position - b.position);
+      levels.forEach((level, index) => {
+        level.position = index + 1;
+      });
+    }
+
+    async function loadLevels() {
+      try {
+        const response = await fetch("./levels.json", {
+          cache: "no-store"
+        });
+
+        if (!response.ok) {
+          throw new Error("No se pudo leer levels.json.");
+        }
+
+        const data = await response.json();
+
+        if (!data || !Array.isArray(data.levels)) {
+          throw new Error("El formato de levels.json no es válido.");
+        }
+
+        levels = data.levels.map((level, index) => ({
+          _id: nextId++,
+          position: Number(level.position) || index + 1,
+          name: String(level.name || ""),
+          creator: String(level.creator || ""),
+          verifier: String(level.verifier || ""),
+          difficulty: String(level.difficulty || "EXTREME DEMON"),
+          cover: safeUrl(level.cover || level.image || ""),
+          video: safeUrl(level.video || ""),
+          id: String(level.id || "")
+        }));
+
+        normalizePositions();
+        loaded = true;
+        render();
+        setStatus("Niveles cargados correctamente.", "success");
+      } catch (error) {
+        loaded = false;
+        levels = [];
+        render();
+        setStatus(
+          "No se pudieron cargar los niveles. " + error.message,
+          "error"
+        );
+      }
+    }
+
+    function render() {
+      const sorted = levels.slice().sort((a, b) => a.position - b.position);
+
+      $("count").textContent =
+        sorted.length + (sorted.length === 1 ? " nivel" : " niveles");
+
+      if (!sorted.length) {
+        $("levelList").innerHTML =
+          '<div class="empty">No hay niveles registrados.</div>';
+        return;
+      }
+
+      $("levelList").innerHTML = sorted.map(level => `
+        <article class="level">
+          <img
+            class="cover"
+            src="${escapeHTML(level.cover || "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=")}"
+            alt=""
+            loading="lazy"
+            onerror="this.style.visibility='hidden'"
+          >
+          <div class="rank">#${level.position}</div>
+          <div class="info">
+            <strong>${escapeHTML(level.name)}</strong>
+            <small>
+              ${escapeHTML(level.difficulty)}<br>
+              Creador: ${escapeHTML(level.creator)}
+            </small>
+          </div>
+          <div class="level-buttons">
+            <button type="button" data-move="-1" data-id="${level._id}"
+              aria-label="Subir nivel"
+              ${level.position === 1 ? "disabled" : ""}>⬆️</button>
+            <button type="button" data-move="1" data-id="${level._id}"
+              aria-label="Bajar nivel"
+              ${level.position === levels.length ? "disabled" : ""}>⬇️</button>
+            <button type="button" data-edit="${level._id}">Editar</button>
+            <button type="button" class="delete"
+              data-delete="${level._id}">Eliminar</button>
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function resetForm() {
+      $("levelForm").reset();
+      $("preview").style.display = "none";
+      $("preview").removeAttribute("src");
+      editingId = null;
+      $("formTitle").textContent = "Añadir nivel";
+      $("saveLevel").textContent = "Añadir nivel";
+      $("cancelEdit").hidden = true;
+    }
+
+    $("cover").addEventListener("input", () => {
+      const url = safeUrl($("cover").value.trim());
+      const preview = $("preview");
+
+      if (!url) {
+        preview.style.display = "none";
+        preview.removeAttribute("src");
+        return;
+      }
+
+      preview.onload = () => preview.style.display = "block";
+      preview.onerror = () => preview.style.display = "none";
+      preview.src = url;
+    });
+
+    $("levelForm").addEventListener("submit", event => {
+      event.preventDefault();
+
+      if (!loaded) {
+        setStatus("Primero debes cargar correctamente levels.json.", "error");
+        return;
+      }
+
+      const name = $("name").value.trim();
+      const creator = $("creator").value.trim();
+      const position = Number($("position").value);
+      const coverText = $("cover").value.trim();
+      const videoText = $("video").value.trim();
+
+      if (!name || !creator ||
+          !Number.isInteger(position) || position < 1) {
+        setStatus("Comprueba el nombre, creador y posición.", "error");
+        return;
+      }
+
+      if (coverText && !safeUrl(coverText)) {
+        setStatus("La URL de la portada no es válida.", "error");
+        return;
+      }
+
+      if (videoText && !safeUrl(videoText)) {
+        setStatus("La URL del vídeo no es válida.", "error");
+        return;
+      }
+
+      const values = {
+        position,
+        name,
+        creator,
+        verifier: $("verifier").value.trim() || "Por confirmar",
+        difficulty: $("difficulty").value,
+        cover: safeUrl(coverText),
+        video: safeUrl(videoText),
+        id: $("levelId").value.trim()
+      };
+
+      if (editingId !== null) {
+        const index = levels.findIndex(level => level._id === editingId);
+        if (index === -1) return;
+
+        levels[index] = { ...levels[index], ...values };
+        normalizePositions();
+        setStatus("Nivel editado. Recuerda publicar para guardar los cambios.");
+      } else {
+        // Insertar en la posición elegida:
+        // todos los niveles de esa posición en adelante bajan una.
+        const insertionPosition = Math.min(position, levels.length + 1);
+
+        levels.forEach(level => {
+          if (level.position >= insertionPosition) {
+            level.position++;
+          }
+        });
+
+        levels.push({
+          _id: nextId++,
+          ...values,
+          position: insertionPosition
+        });
+
+        normalizePositions();
+        setStatus("Nivel insertado y posiciones reorganizadas en cadena. Publica para guardar.");
+      }
+
+      resetForm();
+      render();
+    });
+
+    $("cancelEdit").addEventListener("click", resetForm);
+
+    $("levelList").addEventListener("click", event => {
+      const button = event.target.closest("button");
+      if (!button) return;
+
+      const id = Number(button.dataset.id || button.dataset.edit ||
+                        button.dataset.delete);
+      const index = levels.findIndex(level => level._id === id);
+
+      if (index < 0) return;
+
+      if (button.hasAttribute("data-move")) {
+        const direction = Number(button.dataset.move);
+        const targetPosition = levels[index].position + direction;
+        const neighbor = levels.find(
+          level => level.position === targetPosition
+        );
+
+        if (!neighbor) return;
+
+        const currentPosition = levels[index].position;
+        levels[index].position = neighbor.position;
+        neighbor.position = currentPosition;
+
+        normalizePositions();
+        render();
+        setStatus("Posiciones actualizadas. Publica para guardar los cambios.");
+      }
+
+      if (button.hasAttribute("data-edit")) {
+        const level = levels[index];
+        editingId = level._id;
+
+        $("name").value = level.name;
+        $("position").value = level.position;
+        $("creator").value = level.creator;
+        $("verifier").value =
+          level.verifier === "Por confirmar" ? "" : level.verifier;
+        $("difficulty").value = level.difficulty;
+        $("cover").value = level.cover;
+        $("video").value = level.video;
+        $("levelId").value = level.id;
+
+        $("formTitle").textContent = "Editar nivel";
+        $("saveLevel").textContent = "Guardar cambios";
+        $("cancelEdit").hidden = false;
+
+        if (level.cover) {
+          $("preview").src = level.cover;
+          $("preview").style.display = "block";
+        } else {
+          $("preview").style.display = "none";
+        }
+
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      if (button.hasAttribute("data-delete")) {
+        if (!confirm(`¿Eliminar "${levels[index].name}"?`)) return;
+
+        levels.splice(index, 1);
+        normalizePositions();
+        render();
+        setStatus("Nivel eliminado y posiciones reorganizadas. Publica para guardar.");
+
+        if (editingId === id) resetForm();
+      }
+    });
+
+    $("viewPublic").addEventListener("click", () => {
+      window.open(PUBLIC_URL, "_blank", "noopener,noreferrer");
+    });
+
+    $("publish").addEventListener("click", async () => {
+      if (!loaded) {
+        setStatus("No se puede publicar: los datos no están cargados.", "error");
+        return;
+      }
+
+      $("publish").disabled = true;
+      setStatus("Enviando cambios al servicio de publicación...");
+
+      try {
+        const payload = {
+          levels: levels
+            .slice()
+            .sort((a, b) => a.position - b.position)
+            .map(({ _id, ...level }) => level)
+        };
+
+        const response = await fetch(PUBLISH_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          throw new Error(
+            response.status === 404
+              ? "El servicio de publicación todavía no está configurado."
+              : "El servidor rechazó la publicación (HTTP " +
+                response.status + ")."
+          );
+        }
+
+        setStatus(
+          "El servicio aceptó la solicitud. Comprueba el despliegue y la página pública.",
+          "success"
+        );
+      } catch (error) {
+        setStatus(
+          error.message +
+          " Los cambios aún no están guardados en GitHub.",
+          "error"
+        );
+      } finally {
+        $("publish").disabled = false;
+      }
+    });
+
+    loadLevels();
+  </script>
+</body>
+</html>
