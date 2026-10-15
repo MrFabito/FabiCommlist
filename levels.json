@@ -1,4 +1,14 @@
-
 {
-  "levels": []
+  "levels": [
+    {
+      "position": 1,
+      "name": "Loudly club",
+      "creator": "MaxynGD",
+      "verifier": "No",
+      "difficulty": "EXTREME DEMON",
+      "cover": "https://youtu.be/fa-XJ1KzXXc?si=9xwSDj75oEcEGBiY",
+      "video": "https://youtu.be/fa-XJ1KzXXc?si=9xwSDj75oEcEGBiY",
+      "id": ""
+    }
+  ]
 }
