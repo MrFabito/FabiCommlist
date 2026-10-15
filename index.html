@@ -1,0 +1,365 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101014">
+  <title>FabiCommlist | Geometry Dash</title>
+
+  <style>
+    :root {
+      --bg: #101014;
+      --panel: #19191f;
+      --panel2: #22222a;
+      --text: #f5f5f7;
+      --muted: #a4a4b2;
+      --yellow: #ffe45c;
+      --red: #ff4d67;
+      --border: #30303a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    header {
+      padding: 28px 16px;
+      text-align: center;
+      background: linear-gradient(135deg, #24242d, #141419);
+      border-bottom: 2px solid var(--yellow);
+    }
+
+    .logo {
+      margin: 0;
+      font-size: clamp(28px, 7vw, 46px);
+      font-weight: 900;
+      letter-spacing: -1.5px;
+    }
+
+    .logo span {
+      color: var(--yellow);
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    main {
+      width: min(100% - 28px, 950px);
+      margin: 25px auto 50px;
+    }
+
+    .intro {
+      margin-bottom: 22px;
+    }
+
+    .intro h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+
+    .intro p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin: 22px 0;
+    }
+
+    .stat {
+      padding: 18px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .stat-value {
+      margin-top: 8px;
+      font-size: 27px;
+      font-weight: 800;
+      color: var(--yellow);
+    }
+
+    .toolbar {
+      margin: 20px 0 14px;
+    }
+
+    #search {
+      width: 100%;
+      padding: 14px 16px;
+      color: var(--text);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      font-size: 15px;
+    }
+
+    #search:focus {
+      border-color: var(--yellow);
+    }
+
+    .list-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0 12px;
+    }
+
+    .list-header h2 {
+      margin: 0;
+      font-size: 19px;
+    }
+
+    #count {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    #levels {
+      display: grid;
+      gap: 10px;
+    }
+
+    .level {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      min-width: 0;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .level:hover {
+      border-color: #555562;
+      transform: translateY(-1px);
+    }
+
+    .rank {
+      display: grid;
+      place-items: center;
+      flex: 0 0 48px;
+      height: 48px;
+      background: var(--panel2);
+      border-radius: 9px;
+      font-size: 19px;
+      font-weight: 900;
+    }
+
+    .level-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .level-name {
+      overflow-wrap: anywhere;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .level-creator {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .difficulty {
+      padding: 7px 9px;
+      border-radius: 7px;
+      color: #fff;
+      background: #a52b45;
+      font-size: 10px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .top1 .rank {
+      color: var(--yellow);
+      border: 1px solid #75682b;
+    }
+
+    .empty {
+      padding: 35px 15px;
+      color: var(--muted);
+      background: var(--panel);
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    footer {
+      padding: 24px 15px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    footer strong {
+      color: var(--yellow);
+    }
+
+    @media (max-width: 420px) {
+      .level {
+        gap: 9px;
+        padding: 10px;
+      }
+
+      .rank {
+        flex-basis: 40px;
+        height: 42px;
+        font-size: 16px;
+      }
+
+      .level-name {
+        font-size: 14px;
+      }
+
+      .difficulty {
+        padding: 6px;
+        font-size: 9px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1 class="logo">Fabi<span>Comm</span>list</h1>
+    <p class="subtitle">Geometry Dash Community Demonlist</p>
+  </header>
+
+  <main>
+    <section class="intro">
+      <h2>🏆 Demonlist</h2>
+      <p>
+        Los niveles más difíciles de nuestra comunidad.
+        ¡Descubre las posiciones y busca tus niveles favoritos!
+      </p>
+    </section>
+
+    <section class="stats">
+      <div class="stat">
+        <div class="stat-label">Niveles registrados</div>
+        <div class="stat-value" id="total">4</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-label">Nivel más difícil</div>
+        <div class="stat-value" id="hardest">—</div>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <input
+        id="search"
+        type="search"
+        placeholder="🔎 Buscar nivel o creador..."
+        aria-label="Buscar nivel o creador"
+      >
+    </div>
+
+    <div class="list-header">
+      <h2>📋 Clasificación</h2>
+      <span id="count">4 niveles</span>
+    </div>
+
+    <section id="levels" aria-live="polite"></section>
+  </main>
+
+  <footer>
+    <strong>FabiCommlist</strong><br>
+    Una demonlist creada por la comunidad.<br>
+    No es una clasificación oficial de Geometry Dash.
+  </footer>
+
+  <script>
+    const levels = [
+      { position: 1, name: "Loudly Club", creator: "Por confirmar", difficulty: "EXTREME DEMON" },
+      { position: 2, name: "Nivel de ejemplo 2", creator: "Por confirmar", difficulty: "EXTREME DEMON" },
+      { position: 3, name: "Nivel de ejemplo 3", creator: "Por confirmar", difficulty: "EXTREME DEMON" },
+      { position: 4, name: "Nivel de ejemplo 4", creator: "Por confirmar", difficulty: "EXTREME DEMON" }
+    ];
+
+    const levelsContainer = document.getElementById("levels");
+    const searchInput = document.getElementById("search");
+
+    function renderLevels() {
+      const query = searchInput.value.trim().toLowerCase();
+
+      const filtered = levels
+        .slice()
+        .sort((a, b) => a.position - b.position)
+        .filter(level =>
+          level.name.toLowerCase().includes(query) ||
+          level.creator.toLowerCase().includes(query)
+        );
+
+      document.getElementById("total").textContent = levels.length;
+      document.getElementById("hardest").textContent =
+        levels.length ? "#" + Math.min(...levels.map(l => l.position)) : "—";
+
+      document.getElementById("count").textContent =
+        filtered.length + (filtered.length === 1 ? " nivel" : " niveles");
+
+      if (filtered.length === 0) {
+        levelsContainer.innerHTML =
+          '<div class="empty">No se encontraron niveles 😔</div>';
+        return;
+      }
+
+      levelsContainer.innerHTML = filtered.map(level => `
+        <article class="level ${level.position === 1 ? "top1" : ""}">
+          <div class="rank">#${level.position}</div>
+          <div class="level-info">
+            <div class="level-name">${escapeHTML(level.name)}</div>
+            <div class="level-creator">Creador: ${escapeHTML(level.creator)}</div>
+          </div>
+          <span class="difficulty">${escapeHTML(level.difficulty)}</span>
+        </article>
+      `).join("");
+    }
+
+    function escapeHTML(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      })[char]);
+    }
+
+    searchInput.addEventListener("input", renderLevels);
+    renderLevels();
+  </script>
+</body>
+</html>
