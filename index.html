@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -156,6 +157,16 @@
       })[char]);
     }
 
+    function getYouTubeThumbnail(url) {
+      const match = String(url || "").match(
+        /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([^?&/]+)/
+      );
+
+      return match
+        ? `https://img.youtube.com/vi/${match[1]}/hqdefault.jpg`
+        : "";
+    }
+
     function renderLevels() {
       const query = searchInput.value.trim().toLowerCase();
 
@@ -189,23 +200,30 @@
         return;
       }
 
-      levelsContainer.innerHTML = filtered.map(level => `
-        <article class="level ${Number(level.position) === 1 ? "top1" : ""}">
-          <div class="rank">#${escapeHTML(level.position)}</div>
-          ${level.cover ? `
-            <img class="cover"
-              src="${escapeHTML(level.cover)}"
-              alt="Portada de ${escapeHTML(level.name)}"
-              loading="lazy"
-              onerror="this.style.display='none'">
-          ` : ""}
-          <div class="level-info">
-            <div class="level-name">${escapeHTML(level.name)}</div>
-            <div class="level-creator">Creador: ${escapeHTML(level.creator || "Por confirmar")}</div>
-          </div>
-          <span class="difficulty">${escapeHTML(level.difficulty || "SIN CLASIFICAR")}</span>
-        </article>
-      `).join("");
+      levelsContainer.innerHTML = filtered.map(level => {
+        const cover = level.cover || getYouTubeThumbnail(level.video);
+
+        return `
+          <article class="level ${Number(level.position) === 1 ? "top1" : ""}">
+            <div class="rank">#${escapeHTML(level.position)}</div>
+
+            ${cover ? `
+              <img class="cover"
+                src="${escapeHTML(cover)}"
+                alt="Portada de ${escapeHTML(level.name)}"
+                loading="lazy"
+                onerror="this.style.display='none'">
+            ` : ""}
+
+            <div class="level-info">
+              <div class="level-name">${escapeHTML(level.name)}</div>
+              <div class="level-creator">Creador: ${escapeHTML(level.creator || "Por confirmar")}</div>
+            </div>
+
+            <span class="difficulty">${escapeHTML(level.difficulty || "SIN CLASIFICAR")}</span>
+          </article>
+        `;
+      }).join("");
     }
 
     async function loadLevels() {
