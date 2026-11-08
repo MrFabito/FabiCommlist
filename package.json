@@ -7,6 +7,6 @@
     "node": ">=22.12.0"
   },
   "dependencies": {
-    "@netlify/blobs": "11.1.8"
+    "@netlify/blobs": "11.1.7"
   }
 }
