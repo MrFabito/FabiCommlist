@@ -1,3 +1,4 @@
+
 CREATE TABLE IF NOT EXISTS accounts (
     id TEXT PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
